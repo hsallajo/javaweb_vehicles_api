@@ -6,6 +6,7 @@
 	<modules>
 		<module>boogle-maps</module>
 		<module>eureka</module>
+		<module>prices-micro-service</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -13,6 +14,7 @@
 		<version>2.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.shu</groupId>
 	<artifactId>vehicle-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
