@@ -134,7 +134,7 @@ public class VehiclesApiApplicationTests {
         /*add a car*/
         addCars();
 
-        ResponseEntity<CarResponse> res = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/1", CarResponse.class);
+        ResponseEntity<CarResponse> res = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/2", CarResponse.class);
         assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
         System.out.println("Response: " + res.getBody());
 
