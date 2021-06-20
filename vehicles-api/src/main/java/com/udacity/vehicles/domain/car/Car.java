@@ -3,6 +3,7 @@ package com.udacity.vehicles.domain.car;
 import com.udacity.vehicles.domain.Condition;
 import com.udacity.vehicles.domain.Location;
 import java.time.LocalDateTime;
+import javax.annotation.Generated;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -20,6 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 /**
  * Declares the Car class, related variables and methods.
  */
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Car {
@@ -105,3 +107,4 @@ public class Car {
         this.price = price;
     }
 }
+
