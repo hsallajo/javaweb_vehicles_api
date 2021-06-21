@@ -31,12 +31,15 @@ public class PriceClient {
      *   service is down.
      */
     public String getPrice(Long vehicleId) {
+
+        String base = "/prices/";
+        final String p = base + vehicleId.toString();
+
         try {
             Price price = client
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("services/price/")
-                            .queryParam("vehicleId", vehicleId)
+                            .path(p)
                             .build()
                     )
                     .retrieve().bodyToMono(Price.class).block();
@@ -46,6 +49,6 @@ public class PriceClient {
         } catch (Exception e) {
             log.error("Unexpected error retrieving price for vehicle {}", vehicleId, e);
         }
-        return "(consult price)";
+        return "consult price";
     }
 }

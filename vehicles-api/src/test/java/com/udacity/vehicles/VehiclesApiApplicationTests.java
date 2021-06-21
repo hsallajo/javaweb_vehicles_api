@@ -2,11 +2,6 @@ package com.udacity.vehicles;
 
 import com.udacity.vehicles.domain.CarResponse;
 import com.udacity.vehicles.domain.CarsResponse;
-import com.udacity.vehicles.domain.car.Car;
-import com.udacity.vehicles.domain.car.Details;
-import com.udacity.vehicles.domain.manufacturer.Manufacturer;
-import com.udacity.vehicles.domain.Condition;
-import com.udacity.vehicles.domain.Location;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +12,8 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -108,61 +102,24 @@ public class VehiclesApiApplicationTests {
     @Test
     public void getAllCars(){
 
-        /*add a car*/
+        /*add cars*/
         addCars();
 
         /*request cars*/
         ResponseEntity<CarsResponse> res = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/", CarsResponse.class);
         assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
-        System.out.println("Response: " + res.getBody());
-
-        List<Car> list = res.getBody().getEmbeddedCarList().getCarList();
-
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i).getId());
-            System.out.println(list.get(i).getDetails().getModel());
-            System.out.println(list.get(i).getDetails().getModelYear());
-            System.out.println(list.get(i).getDetails().getEngine());
-            System.out.println(list.get(i).getPrice());
-            System.out.println("\n");
-        }
+        assertThat(res.getBody().getEmbeddedCarList().getCarList().size(), equalTo(2));
 
     }
 
     @Test
     public void getPrice(){
-        /*add a car*/
         addCars();
 
         ResponseEntity<CarResponse> res = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/2", CarResponse.class);
         assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
-        System.out.println("Response: " + res.getBody());
 
-        System.out.println("Looking for price for id: " + res.getBody().getId());
-        System.out.println("Model: " + res.getBody().getDetails().getModel());
-        System.out.println("Price: " + res.getBody().getPrice() + "$");
-
-
-    }
-
-
-    private Car getAnotherCar() {
-        Car car = new Car();
-        car.setLocation(new Location(37.7749, 122.4194));
-        Details details = new Details();
-        Manufacturer manufacturer = new Manufacturer(101, "Ford");
-        details.setManufacturer(manufacturer);
-        details.setModel("F-150");
-        details.setMileage(10100);
-        details.setExternalColor("Red");
-        details.setBody("pickup");
-        details.setEngine("4.6L V8");
-        details.setFuelType("Gasoline");
-        details.setModelYear(2021);
-        details.setProductionYear(2020);
-        details.setNumberOfDoors(4);
-        car.setDetails(details);
-        car.setCondition(Condition.USED);
-        return car;
+        assertThat(res.getBody().getDetails().getModel(), equalTo("F-150"));
+        assertThat(res.getBody().getPrice(), notNullValue());
     }
 }
