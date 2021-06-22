@@ -1,9 +1,15 @@
 package com.udacity.vehicles;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.udacity.vehicles.domain.Car;
 import com.udacity.vehicles.domain.CarResponse;
 import com.udacity.vehicles.domain.CarsResponse;
+import com.udacity.vehicles.domain.car.Details;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +17,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -73,36 +82,85 @@ public class VehiclesApiApplicationTests {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private static final Logger log = LoggerFactory.getLogger(VehiclesApiApplicationTests.class);
+
     @Test
     public void contextLoads() {
     }
 
-    public void addCars() {
+    @Test
+    public void addCar() {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> ent = new HttpEntity<String>(REQUEST_JSON_CHEVROLET,headers);
+        HttpEntity<String> ent = new HttpEntity<String>(REQUEST_JSON_CHEVROLET, headers);
         ResponseEntity<String> ans = this.restTemplate.exchange("http://localhost:" + port + "/cars"
                 , HttpMethod.POST
                 , ent
                 , String.class);
 
-        HttpEntity<String> ent2 = new HttpEntity<String>(REQUEST_JSON_FORD,headers);
-        ResponseEntity<String> ans2 = this.restTemplate.exchange("http://localhost:" + port + "/cars"
-                , HttpMethod.POST
-                , ent2
-                , String.class);
-
-        System.out.println("Answer: " + ans.getStatusCode());
-        System.out.println("Answer(2): " + ans2.getStatusCode());
+        assertThat(ans.getStatusCode(), equalTo(HttpStatus.CREATED));
 
     }
 
     @Test
-    public void getAllCars(){
+    public void updateCar() {
 
-        /*add cars*/
+        addCar();
+
+        ResponseEntity<CarResponse> aCar = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/1", CarResponse.class);
+
+        /* modify the car */
+        Details oriDetails = aCar.getBody().getDetails();
+        Details updatedDetails = oriDetails;
+        updatedDetails.setExternalColor("yellow");
+
+        Car updatedCar = new Car();
+        updatedCar.setDetails(updatedDetails);
+        updatedCar.setCondition(aCar.getBody().getCondition());
+        updatedCar.setCreatedAt(aCar.getBody().getCreatedAt());
+        updatedCar.setPrice(aCar.getBody().getPrice());
+        updatedCar.setId(aCar.getBody().getId());
+        updatedCar.setLinks(aCar.getBody().getLinks());
+        updatedCar.setLocation(aCar.getBody().getLocation());
+        updatedCar.setModifiedAt(aCar.getBody().getModifiedAt());
+
+        /* update the car */
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> ent = new HttpEntity<>(objToJson(updatedCar), headers);
+        ResponseEntity<String> ans = this.restTemplate.exchange("http://localhost:" + port + "/cars/1"
+                , HttpMethod.PUT
+                , ent
+                , String.class);
+
+
+        ResponseEntity<CarResponse> res = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/1", CarResponse.class);
+        assertThat(res.getBody().getDetails().getExternalColor(), equalTo("yellow"));
+
+    }
+
+    @Test
+    public void deleteCar(){
+
+        addCars();
+
+        this.restTemplate.delete("http://localhost:" + port + "/cars/1");
+
+        ResponseEntity<CarsResponse> res = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/", CarsResponse.class);
+        assertThat(res.getBody().getEmbeddedCarList().getCarList().size(), equalTo(1));
+
+    }
+
+    @Test
+    public void getAllCars() {
+
+        /* adds (2) cars */
         addCars();
 
         /*request cars*/
@@ -113,7 +171,7 @@ public class VehiclesApiApplicationTests {
     }
 
     @Test
-    public void getPrice(){
+    public void getPrice() {
         addCars();
 
         ResponseEntity<CarResponse> res = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/2", CarResponse.class);
@@ -121,6 +179,37 @@ public class VehiclesApiApplicationTests {
 
         assertThat(res.getBody().getDetails().getModel(), equalTo("F-150"));
         assertThat(res.getBody().getPrice(), notNullValue());
+    }
+
+    public void addCars() {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> ent = new HttpEntity<String>(REQUEST_JSON_CHEVROLET, headers);
+        ResponseEntity<String> ans = this.restTemplate.exchange("http://localhost:" + port + "/cars"
+                , HttpMethod.POST
+                , ent
+                , String.class);
+
+        HttpEntity<String> ent2 = new HttpEntity<String>(REQUEST_JSON_FORD, headers);
+        ResponseEntity<String> ans2 = this.restTemplate.exchange("http://localhost:" + port + "/cars"
+                , HttpMethod.POST
+                , ent2
+                , String.class);
+
+    }
+
+    public String objToJson(Car aCar) {
+
+        String objJson = null;
+        try {
+            objJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(aCar);
+        } catch (JsonProcessingException e) {
+            log.debug("ResponseEntity<CarResponse> object to Json conversion failed.", e);
+        }
+        System.out.println("json object: " + objJson);
+        return objJson;
     }
 
 }
