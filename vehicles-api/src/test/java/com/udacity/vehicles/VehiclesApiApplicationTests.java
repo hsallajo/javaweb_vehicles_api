@@ -122,4 +122,5 @@ public class VehiclesApiApplicationTests {
         assertThat(res.getBody().getDetails().getModel(), equalTo("F-150"));
         assertThat(res.getBody().getPrice(), notNullValue());
     }
+
 }
