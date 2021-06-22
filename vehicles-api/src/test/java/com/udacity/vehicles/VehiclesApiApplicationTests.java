@@ -208,7 +208,6 @@ public class VehiclesApiApplicationTests {
         } catch (JsonProcessingException e) {
             log.debug("ResponseEntity<CarResponse> object to Json conversion failed.", e);
         }
-        System.out.println("json object: " + objJson);
         return objJson;
     }
 
