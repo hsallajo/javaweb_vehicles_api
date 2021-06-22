@@ -15,27 +15,9 @@ view of vehicle details including price and address.
 
 ## Instructions
 
-#### TODOs
-
-- Implement the `TODOs` within the `CarService.java` and `CarController.java`  files
-- Add additional tests to the `CarControllerTest.java` file based on the `TODOs`
-- Implement API documentation using Swagger
-
 #### Run the Code
 
-To properly run this application you need to start the Orders API and
-the Service API first.
-
-
-```
-$ mvn clean package
-```
-
-```
-$ java -jar target/vehicles-api-0.0.1-SNAPSHOT.jar
-```
-
-Import it in your favorite IDE as a Maven Project.
+To properly run this application you need to start Eureka first, followed by the Maps API, Prices API and finally the Vehicles-API. Note: Price and location data are mocked.
 
 ## Operations
 
