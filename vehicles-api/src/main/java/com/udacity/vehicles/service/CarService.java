@@ -1,6 +1,5 @@
 package com.udacity.vehicles.service;
 
-import com.udacity.vehicles.client.maps.Address;
 import com.udacity.vehicles.client.maps.MapsClient;
 import com.udacity.vehicles.client.prices.PriceClient;
 import com.udacity.vehicles.domain.Location;
@@ -9,9 +8,7 @@ import com.udacity.vehicles.domain.car.CarRepository;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * Implements the car service create, read, update or delete
@@ -47,21 +44,14 @@ public class CarService {
      */
     public Car findById(Long id) {
 
-        System.out.println("Car id is: " + id);
         assert (repository != null);
 
         Car car = doFindCarById(id);
 
-        String price = this.pricing.getPrice(id);
-        System.out.println("Price is: " + price);
-
-        car.setPrice(price);
+        car.setPrice(this.pricing.getPrice(id));
 
         Location loc = car.getLocation();
-
         Location addr = this.maps.getAddress(loc);
-
-        System.out.println("Address is: " + addr.getAddress());
 
         car.setLocation(addr);
 
