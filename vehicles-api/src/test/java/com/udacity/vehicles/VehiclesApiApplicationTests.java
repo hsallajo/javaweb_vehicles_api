@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.udacity.vehicles.domain.Car;
 import com.udacity.vehicles.domain.CarResponse;
 import com.udacity.vehicles.domain.CarsResponse;
+import com.udacity.vehicles.domain.Condition;
 import com.udacity.vehicles.domain.car.Details;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -117,11 +118,13 @@ public class VehiclesApiApplicationTests {
         /* modify the car */
         Details oriDetails = aCar.getBody().getDetails();
         Details updatedDetails = oriDetails;
+        Condition updatedCondition = Condition.NEW;
         updatedDetails.setExternalColor("yellow");
+
 
         Car updatedCar = new Car();
         updatedCar.setDetails(updatedDetails);
-        updatedCar.setCondition(aCar.getBody().getCondition());
+        updatedCar.setCondition(updatedCondition.toString());
         updatedCar.setCreatedAt(aCar.getBody().getCreatedAt());
         updatedCar.setPrice(aCar.getBody().getPrice());
         updatedCar.setId(aCar.getBody().getId());
@@ -142,6 +145,7 @@ public class VehiclesApiApplicationTests {
 
         ResponseEntity<CarResponse> res = this.restTemplate.getForEntity("http://localhost:" + port + "/cars/1", CarResponse.class);
         assertThat(res.getBody().getDetails().getExternalColor(), equalTo("yellow"));
+        assertThat(res.getBody().getCondition(), equalTo("NEW"));
 
     }
 
